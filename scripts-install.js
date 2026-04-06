@@ -1,24 +1,17 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-// Clean dist folder
-const rimrafPath = path.join(__dirname, 'node_modules', '.bin', 'rimraf');
-const cleanProcess = spawn(rimrafPath, ['dist'], {
+// Use npm run build with proper environment
+const buildProcess = spawn('npm', ['run', 'build'], {
   stdio: 'inherit',
-  cwd: __dirname
+  cwd: __dirname,
+  shell: true,
+  env: {
+    ...process.env,
+    PATH: `${path.join(__dirname, 'node_modules', '.bin')}:${process.env.PATH}`
+  }
 });
 
-cleanProcess.on('exit', (code) => {
-  if (code !== 0) process.exit(code);
-
-  // Run TypeScript compiler
-  const tscPath = path.join(__dirname, 'node_modules', '.bin', 'tsc');
-  const buildProcess = spawn(tscPath, [], {
-    stdio: 'inherit',
-    cwd: __dirname
-  });
-
-  buildProcess.on('exit', (code) => {
-    process.exit(code || 0);
-  });
+buildProcess.on('exit', (code) => {
+  process.exit(code || 0);
 });

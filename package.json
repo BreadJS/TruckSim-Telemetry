@@ -7,9 +7,9 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "postinstall": "node scripts-install.js",
-    "clean": "npx rimraf dist",
-    "build": "npx rimraf dist && tsc",
+    "postinstall": "npm run build",
+    "clean": "rimraf dist",
+    "build": "rimraf dist && tsc",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint:fix": "eslint --fix .",
@@ -34,9 +34,11 @@
     "url": "https://github.com/kniffen/TruckSim-Telemetry/issues"
   },
   "homepage": "https://kniffen.dev/TruckSim-Telemetry/",
-  "devDependencies": {
-    "@types/node": "^25.5.2",
+  "dependencies": {
     "rimraf": "^6.0.0",
     "typescript": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2"
   }
 }

@@ -4,12 +4,12 @@
   "description": "Telemetry data from the scs-sdk-plugin",
   "main": "dist/main.js",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
     "clean": "npx rimraf dist",
-    "build": "npx rimraf dist && tsc",
-    "install": "npm run build",
+    "build": "npx rimraf dist && npx typescript",
+    "install": "node -e \"require('child_process').spawn('npm', ['run', 'build'], { stdio: 'inherit', cwd: __dirname })\"",
     "test": "npx jest",
     "test:watch": "npx jest --watch",
     "lint:fix": "npx eslint --fix .",

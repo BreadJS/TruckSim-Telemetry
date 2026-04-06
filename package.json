@@ -9,7 +9,7 @@
   "scripts": {
     "clean": "npx rimraf dist",
     "build": "npx rimraf dist && npx typescript",
-    "install": "node -e \"require('child_process').spawn('npm', ['run', 'build'], { stdio: 'inherit', cwd: __dirname })\"",
+    "install": "node scripts-install.js",
     "test": "npx jest",
     "test:watch": "npx jest --watch",
     "lint:fix": "npx eslint --fix .",

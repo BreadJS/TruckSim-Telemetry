@@ -1,10 +1,18 @@
 const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 // Change to package directory
 process.chdir(__dirname);
 
 try {
+  // Check if tsconfig.json exists
+  const tsconfigPath = path.join(__dirname, 'tsconfig.json');
+  if (!fs.existsSync(tsconfigPath)) {
+    throw new Error(`tsconfig.json not found at ${tsconfigPath}`);
+  }
+  console.log('Found tsconfig.json at:', tsconfigPath);
+
   // Find typescript package
   let tscPath;
   try {
@@ -22,10 +30,16 @@ try {
     // Ignore rimraf errors
   }
 
-  // Run TypeScript compiler
+  // Run TypeScript compiler with explicit working directory
   console.log('Running TypeScript compiler...');
   console.log('Using tsc path:', tscPath);
-  execSync(`node "${tscPath}"`, { stdio: 'inherit' });
+  console.log('Working directory:', __dirname);
+
+  execSync(`node "${tscPath}"`, {
+    stdio: 'inherit',
+    cwd: __dirname,
+    env: { ...process.env }
+  });
   console.log('Build complete!');
 } catch (error) {
   console.error('Build failed:', error.message);

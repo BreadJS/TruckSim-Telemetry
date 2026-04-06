@@ -14,11 +14,13 @@ import { createConfig, type TSTConfig } from '../createConfig';
  * const bufferWithCustomConfig = getBuffer({ sharedMemoryName: '/CustomTelemetry' });
  * ```
  */
-export const getBuffer = function(config: TSTConfig = createConfig()): Buffer | null {
+export const getBuffer = function(config: TSTConfig = {}): Buffer | null {
+  // Merge provided config with defaults
+  const mergedConfig = { ...createConfig(), ...config };
+
   try {
-    const buffer = scsSDKTelemetry.getBuffer(config.sharedMemoryName);
+    const buffer = scsSDKTelemetry.getBuffer(mergedConfig.sharedMemoryName);
     return buffer;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
     return null;
   }

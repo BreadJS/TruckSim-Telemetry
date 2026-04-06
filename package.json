@@ -7,7 +7,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "preinstall": "npm run build",
+    "postinstall": "npm run build",
     "clean": "npx rimraf dist",
     "build": "npx rimraf dist && npx tsc",
     "test": "jest",

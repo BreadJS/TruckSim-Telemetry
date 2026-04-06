@@ -9,7 +9,7 @@ try {
   execSync('npx rimraf dist', { stdio: 'inherit' });
 
   // Run TypeScript compiler using npx
-  execSync('npx typescript tsc', { stdio: 'inherit' });
+  execSync('npx -p typescript tsc', { stdio: 'inherit' });
 } catch (error) {
   process.exit(error.status || 1);
 }

@@ -9,7 +9,7 @@
   "scripts": {
     "postinstall": "npm run build",
     "clean": "npx rimraf dist",
-    "build": "npx rimraf dist && npx tsc",
+    "build": "npx rimraf dist && ./node_modules/.bin/tsc",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint:fix": "eslint --fix .",

@@ -7,9 +7,9 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "postinstall": "npm run build",
+    "postinstall": "node scripts-install.js",
     "clean": "npx rimraf dist",
-    "build": "npx rimraf dist && ./node_modules/.bin/tsc",
+    "build": "npx rimraf dist && tsc",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint:fix": "eslint --fix .",

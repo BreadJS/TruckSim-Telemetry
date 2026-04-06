@@ -9,7 +9,7 @@
   "scripts": {
     "postinstall": "npm run build",
     "clean": "rimraf dist",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc -p tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint:fix": "eslint --fix .",

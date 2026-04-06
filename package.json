@@ -42,10 +42,9 @@
   },
   "homepage": "https://kniffen.dev/TruckSim-Telemetry/",
   "dependencies": {
+    "@types/node": "^25.5.2",
     "rimraf": "^6.0.0",
     "typescript": "^6.0.2"
   },
-  "devDependencies": {
-    "@types/node": "^25.5.2"
-  }
+  "devDependencies": {}
 }

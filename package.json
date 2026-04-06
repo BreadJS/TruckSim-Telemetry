@@ -7,8 +7,8 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "npm run clean && tsc",
+    "clean": "npx rimraf dist",
+    "build": "npx rimraf dist && npx typescript",
     "install": "npm run build",
     "test": "npx jest",
     "test:watch": "npx jest --watch",

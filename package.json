@@ -6,6 +6,7 @@
   "files": [
     "src",
     "binding.gyp",
+    "scsSDKTelemetry.cc",
     "tsconfig.json",
     "scripts-install.js"
   ],

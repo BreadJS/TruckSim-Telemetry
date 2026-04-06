@@ -3,7 +3,7 @@
 build
 coverage
 node_modules
-src
+dist
 docs
 documents
 
@@ -12,4 +12,3 @@ documents
 *.log
 eslint.config.mjs
 jest.config.js
-tsconfig.json

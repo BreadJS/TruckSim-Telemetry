@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "Telemetry data from the scs-sdk-plugin",
   "main": "dist/main.js",
+  "files": [
+    "src",
+    "binding.gyp",
+    "tsconfig.json",
+    "scripts-install.js"
+  ],
   "engines": {
     "node": ">=18.0.0"
   },

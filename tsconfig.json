@@ -1,13 +1,9 @@
 {
   "compilerOptions": {
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
+    "types": ["node"],
     "noImplicitAny": true,
     "target": "ES2022",
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -15,15 +11,17 @@
     "module": "commonjs",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "rootDir": "./src",
     "outDir": "./dist",
     "declaration": true,
-    "sourceMap": true,
+    "sourceMap": true
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.test.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts"
   ],
 }

@@ -9,6 +9,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc",
+    "install": "npm run build",
     "test": "npx jest",
     "test:watch": "npx jest --watch",
     "lint:fix": "npx eslint --fix .",
@@ -19,7 +20,7 @@
   "gypfile": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kniffen/TruckSim-Telemetry.git"
+    "url": "git+https://github.com/BreadJS/TruckSim-Telemetry.git"
   },
   "keywords": [
     "ats",

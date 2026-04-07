@@ -15,6 +15,12 @@
 #endif
 
 #if !defined(_WIN32)
+// Helper function to check if a file exists
+static bool fileExists(const char* path) {
+    struct stat st;
+    return (stat(path, &st) == 0);
+}
+
 // Helper function to find the game PID
 static pid_t findGamePid() {
     DIR* proc_dir = opendir("/proc");
@@ -48,7 +54,10 @@ static pid_t findGamePid() {
                     }
                 }
 
-                if (strstr(cmdline, "eurotrucks2") != nullptr ||
+                // Check for various game executable patterns
+                if (strstr(cmdline, "eurotrucks2.exe") != nullptr ||
+                    strstr(cmdline, "amtrucks.exe") != nullptr ||
+                    strstr(cmdline, "eurotrucks2") != nullptr ||
                     strstr(cmdline, "amtrucks") != nullptr) {
                     game_pid = pid;
                     break;
@@ -61,10 +70,47 @@ static pid_t findGamePid() {
     return game_pid;
 }
 
-// Helper function to check if a file exists
-static bool fileExists(const char* path) {
-    struct stat st;
-    return (stat(path, &st) == 0);
+// Helper function to get the flatpak sandbox path
+static char* getFlatpakSandboxPath(pid_t pid, const char* base_name) {
+    // Try Flatpak sandbox path: /run/user/{uid}/.flatpak/...
+    char uid_path[64];
+    snprintf(uid_path, sizeof(uid_path), "/proc/%d/root/run/user", pid);
+
+    // Check if we can access the run directory
+    if (fileExists(uid_path)) {
+        DIR* run_dir = opendir(uid_path);
+        if (run_dir) {
+            struct dirent* uid_entry;
+            while ((uid_entry = readdir(run_dir)) != nullptr) {
+                // Look for UID directories (numeric)
+                if (uid_entry->d_name[0] != '.') {
+                    char flatpak_path[512];
+                    // Try the new Flatpak 2.x path first
+                    snprintf(flatpak_path, sizeof(flatpak_path),
+                             "/proc/%d/root/run/user/%s/.flatpak-helper/%s",
+                             pid, uid_entry->d_name, base_name);
+
+                    if (fileExists(flatpak_path)) {
+                        closedir(run_dir);
+                        return strdup(flatpak_path);
+                    }
+
+                    // Try the old Flatpak path
+                    snprintf(flatpak_path, sizeof(flatpak_path),
+                             "/proc/%d/root/run/user/%s/flatpak-%s",
+                             pid, uid_entry->d_name, base_name);
+
+                    if (fileExists(flatpak_path)) {
+                        closedir(run_dir);
+                        return strdup(flatpak_path);
+                    }
+                }
+            }
+            closedir(run_dir);
+        }
+    }
+
+    return nullptr;
 }
 
 // Helper function to get the actual shared memory path (handles sandbox)
@@ -73,7 +119,7 @@ static char* getSharedMemoryPath(const char* name) {
     // Remove leading slash from name if present
     const char* base_name = (name[0] == '/') ? name + 1 : name;
 
-    // Try normal POSIX shared memory first
+    // 1. Try normal POSIX shared memory first
     char normal_path[256];
     snprintf(normal_path, sizeof(normal_path), "/dev/shm/%s", base_name);
 
@@ -81,9 +127,10 @@ static char* getSharedMemoryPath(const char* name) {
         return strdup(normal_path);
     }
 
-    // Check for sandboxed shared memory (Steam Proton/bwrap)
+    // 2. Check for sandboxed shared memory via /proc
     pid_t game_pid = findGamePid();
     if (game_pid > 0) {
+        // 2a. Try standard bwrap/Proton path: /proc/{pid}/root/dev/shm/
         char sandbox_path[512];
         snprintf(sandbox_path, sizeof(sandbox_path), "/proc/%d/root/dev/shm/%s",
                  game_pid, base_name);
@@ -91,9 +138,65 @@ static char* getSharedMemoryPath(const char* name) {
         if (fileExists(sandbox_path)) {
             return strdup(sandbox_path);
         }
+
+        // 2b. Try alternative Proton path with .wine prefix
+        char wine_shm_path[512];
+        snprintf(wine_shm_path, sizeof(wine_shm_path),
+                 "/proc/%d/root/dev/shm/.wine_%s",
+                 game_pid, base_name);
+
+        if (fileExists(wine_shm_path)) {
+            return strdup(wine_shm_path);
+        }
+
+        // 2c. Try with semicolon prefix (Windows-style named pipe in Wine)
+        char wine_pipe_path[512];
+        snprintf(wine_pipe_path, sizeof(wine_pipe_path),
+                 "/proc/%d/root/dev/shm/;wine_%s",
+                 game_pid, base_name);
+
+        if (fileExists(wine_pipe_path)) {
+            return strdup(wine_pipe_path);
+        }
+
+        // 2d. Try /run/user/... path for newer sandbox implementations
+        char run_shm_path[512];
+        snprintf(run_shm_path, sizeof(run_shm_path),
+                 "/proc/%d/root/run/shm/%s",
+                 game_pid, base_name);
+
+        if (fileExists(run_shm_path)) {
+            return strdup(run_shm_path);
+        }
+
+        // 2e. Try checking the environment's tmp directory
+        char tmp_shm_path[512];
+        snprintf(tmp_shm_path, sizeof(tmp_shm_path),
+                 "/proc/%d/root/tmp/%s",
+                 game_pid, base_name);
+
+        if (fileExists(tmp_shm_path)) {
+            return strdup(tmp_shm_path);
+        }
+
+        // 2f. Try Flatpak-specific paths
+        char* flatpak_path = getFlatpakSandboxPath(game_pid, base_name);
+        if (flatpak_path) {
+            return flatpak_path;
+        }
+
+        // 2g. Try with Wine prefix directory (check common locations)
+        char wine_prefix_path[512];
+        snprintf(wine_prefix_path, sizeof(wine_prefix_path),
+                 "/proc/%d/root/.wine/%s",
+                 game_pid, base_name);
+
+        if (fileExists(wine_prefix_path)) {
+            return strdup(wine_prefix_path);
+        }
     }
 
-    // Fall back to normal path (will fail if it doesn't exist)
+    // 3. Fall back to normal path (will fail if it doesn't exist)
     return strdup(normal_path);
 }
 #endif // !_WIN32

@@ -35,12 +35,19 @@ static pid_t findGamePid() {
 
             FILE* cmdline_file = fopen(cmdline_path, "r");
             if (cmdline_file) {
-                char cmdline[1024];
+                char cmdline[4096];  // Increased buffer size for Proton paths
                 size_t bytes_read = fread(cmdline, 1, sizeof(cmdline) - 1, cmdline_file);
                 cmdline[bytes_read] = '\0';
                 fclose(cmdline_file);
 
-                // Check for eurotrucks2 or amtrucks
+                // Check for eurotrucks2 or amtrucks (case-insensitive)
+                // Convert to lowercase for comparison
+                for (size_t i = 0; i < bytes_read; i++) {
+                    if (cmdline[i] >= 'A' && cmdline[i] <= 'Z') {
+                        cmdline[i] = cmdline[i] + 32;
+                    }
+                }
+
                 if (strstr(cmdline, "eurotrucks2") != nullptr ||
                     strstr(cmdline, "amtrucks") != nullptr) {
                     game_pid = pid;

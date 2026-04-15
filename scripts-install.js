@@ -40,7 +40,21 @@ try {
     cwd: __dirname,
     env: { ...process.env }
   });
-  console.log('Build complete!');
+  console.log('TypeScript build complete!');
+
+  // Build native addon with node-gyp
+  console.log('Building native addon with node-gyp...');
+  try {
+    execSync('npx node-gyp rebuild', {
+      stdio: 'inherit',
+      cwd: __dirname,
+      env: { ...process.env }
+    });
+    console.log('Native addon build complete!');
+  } catch (e) {
+    console.error('Native addon build failed:', e.message);
+    throw e;
+  }
 } catch (error) {
   console.error('Build failed:', error.message);
   process.exit(error.status || 1);

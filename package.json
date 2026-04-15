@@ -8,7 +8,8 @@
     "binding.gyp",
     "scsSDKTelemetry.cc",
     "tsconfig.json",
-    "scripts-install.js"
+    "scripts-install.js",
+    "build/Release/*.node"
   ],
   "engines": {
     "node": ">=18.0.0"
@@ -22,7 +23,6 @@
     "lint:fix": "eslint --fix .",
     "lint": "eslint ."
   },
-  "gypfile": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BreadJS/TruckSim-Telemetry.git"

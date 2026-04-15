@@ -115,19 +115,34 @@ export function truckSimTelemetry(opts?: TSTOptions): TruckSimTelemetry {
   const bufferReader = createBufferReader();
 
   // Initialize
-  bufferReader.setBuffer(getBuffer(opts));
-  updateTelemetryData(tst.data.current, bufferReader);
-  updateTelemetryData(tst.data.previous, bufferReader);
+  const initialBuffer = getBuffer(opts);
+  if (initialBuffer) {
+    bufferReader.setBuffer(initialBuffer);
+    updateTelemetryData(tst.data.current, bufferReader);
+    updateTelemetryData(tst.data.previous, bufferReader);
+  }
 
   setInterval(() => {
-    bufferReader.setBuffer(getBuffer(opts));
-    updateTelemetryData(tst.data.current, bufferReader);
-    handleEvents(tst);
-    if (opts?.onUpdate) {
-      opts.onUpdate(tst.data.current);
-    }
+    const buffer = getBuffer(opts);
 
-    updateTelemetryData(tst.data.previous, bufferReader);
+    // Only update if we have a valid buffer (game is running)
+    if (buffer) {
+      bufferReader.setBuffer(buffer);
+      updateTelemetryData(tst.data.current, bufferReader);
+      handleEvents(tst);
+      if (opts?.onUpdate) {
+        opts.onUpdate(tst.data.current);
+      }
+      updateTelemetryData(tst.data.previous, bufferReader);
+    } else {
+      // Buffer is null (game not running), emit disconnected event
+      if (tst.data.current.sdkActive) {
+        // We were connected, now we're not
+        tst.emit('disconnected');
+      }
+      // Mark as not active
+      tst.data.current.sdkActive = false;
+    }
   }, 1000 / 60);
 
   return tst;

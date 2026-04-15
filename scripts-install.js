@@ -42,7 +42,7 @@ try {
   });
   console.log('TypeScript build complete!');
 
-  // Build native addon with node-gyp
+  // Build native addon with node-gyp (optional - may fail on some platforms)
   console.log('Building native addon with node-gyp...');
   try {
     execSync('npx node-gyp rebuild', {
@@ -52,8 +52,8 @@ try {
     });
     console.log('Native addon build complete!');
   } catch (e) {
-    console.error('Native addon build failed:', e.message);
-    throw e;
+    console.warn('Native addon build failed (may be expected on some platforms):', e.message);
+    console.warn('The package will still work, but native functionality may be limited.');
   }
 } catch (error) {
   console.error('Build failed:', error.message);

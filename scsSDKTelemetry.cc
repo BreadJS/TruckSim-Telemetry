@@ -3,18 +3,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <dirent.h>
 
 #if defined(_WIN32)
   #include <windows.h>
 #else
+  #include <dirent.h>
   #include <sys/mman.h>
   #include <sys/stat.h>
   #include <fcntl.h>
   #include <unistd.h>
-#endif
 
-#if !defined(_WIN32)
 // Helper function to check if a file exists
 static bool fileExists(const char* path) {
     struct stat st;
